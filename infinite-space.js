@@ -31,16 +31,19 @@ function throttle(fn, wait) {
      * @param {number} contentSize.height - content height
      * @param {number} edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
      * @param {number} scrollStep - number of pixels that will be added to the `wrapper` size on each resize step
+     * @param {number} scale - wrapper transform scale [0,...,1]
     */
 
     this.defaultData = {
       wrapper: ".wrapper",
       fakeContent: ".scroll-fake-content",
       content: ".content",
-      throttleMs: 10,
-      edgeDistance: 100,
-      scrollStep: 10, //px
+      throttleMs: 50,
+      edgeDistance: 50,
+      scrollStep: 100, //px
       fakeContentSize: null,
+      scale: 1,
+      lastPosition: [0, 0],
       getMaxTop: function () {
         return 10000;
       },
@@ -92,7 +95,14 @@ function throttle(fn, wait) {
   };
 
   InfiniteSpace.prototype.handleDrag = function (position, element) {
-    console.log('InfiniteSpace.handleDrag.position', position);
+    // console.log('InfiniteSpace.handleDrag.position', position);
+
+    var now = new Date().getTime();
+    
+    if (now - this.lastCall < this.throttleMs){
+      return;
+    }
+
     var wrapperWidth = this.isBody ? $(window).width() : this.$wrapper.width(),
       wrapperHeight = this.isBody ? $(window).height() : this.$wrapper.height(),
       fakeContentCenter = getCenter(this.$fakeContent),
@@ -100,43 +110,60 @@ function throttle(fn, wait) {
       left = position[0] + this.elementMarginLeft,
       contentLeft = this.$content.position().left,
       contentTop = this.$content.position().top,
+
       scrollWrapper = this.isBody ? window : this.wrapper,
+      
       scrollLeft = Math.max(scrollWrapper.scrollLeft || scrollWrapper.scrollX),
       scrollTop = Math.max(scrollWrapper.scrollTop || scrollWrapper.scrollY),
+     
       topDistance = contentTop + top,
       adjustTop = contentTop + top <= this.edgeDistance,
       scrollToTop = contentTop + top <= scrollTop + this.edgeDistance,
+      
       bottomDistance = this.$fakeContent.height() - (contentTop + top),
       adjustBottom = this.edgeDistance >= bottomDistance,
-      scrollToBottom =
-        contentTop + top >= wrapperHeight + scrollTop - this.edgeDistance,
-      leftDistance = contentLeft + left,
-      adjustLeft = leftDistance <= this.edgeDistance,
+      scrollToBottom = contentTop + top >= wrapperHeight + scrollTop - this.edgeDistance,
+      
+      leftDistance = contentLeft + left * this.scale,
+      adjustLeft = this.lastPosition[0] > position[0] && leftDistance <= this.edgeDistance - this.edgeDistance / this.scale,
       scrollToLeft = contentLeft + left <= scrollLeft + this.edgeDistance,
+     
       rightDistance = this.$fakeContent.width() - (contentLeft + left),
-      adjustRight = this.edgeDistance >= rightDistance,
+      adjustRight = this.lastPosition[0] < position[0] && this.edgeDistance >= rightDistance,
       scrollToRight = contentLeft + left >= wrapperWidth + scrollLeft - this.edgeDistance;
 
-    if (adjustTop) {
-      var newMarginTop = 0;
-      this.$fakeContent.height(this.$fakeContent.height() + this.edgeDistance);
-      this.$content.css({ top: this.$content.position().top + this.edgeDistance });
-      newMarginTop = this.elementMarginTop - this.edgeDistance;
+      this.lastPosition = position || [0, 0];
+      this.lastCall = now;
 
-      $(element).css({ marginTop: newMarginTop });
-      this.elementMarginTop = newMarginTop;
-    }
-    if (scrollToTop) {
-      scrollWrapper.scrollTo(
-        scrollLeft,
-        scrollTop - this.scrollStep + (adjustTop ? this.edgeDistance : 0)
-      );
-    }
+    // if (adjustTop) {
+    //   var newMarginTop = 0;
+    //   this.$fakeContent.height(this.$fakeContent.height() + this.edgeDistance);
+    //   this.$content.css({ top: this.$content.position().top + this.edgeDistance });
+    //   newMarginTop = this.elementMarginTop - this.edgeDistance;
+
+    //   $(element).css({ marginTop: newMarginTop });
+    //   this.elementMarginTop = newMarginTop;
+    // }
+    // if (scrollToTop) {
+    //   scrollWrapper.scrollTo(
+    //     scrollLeft,
+    //     scrollTop - this.scrollStep + (adjustTop ? this.edgeDistance : 0)
+    //   );
+    // }
 
     if (adjustLeft) {
       var newMarginLeft = 0;
-      this.$fakeContent.width(this.$fakeContent.width() + this.edgeDistance);
-      this.$content.css({ left: this.$content.position().left + this.edgeDistance });
+      
+      this.$fakeContent.width(this.$fakeContent.width() + (this.edgeDistance - this.edgeDistance / this.scale));
+      this.$content.css({ left: this.$content.position().left / this.scale + (this.edgeDistance)});
+      console.log(
+        "newleft",
+        contentLeft,
+        left,
+        leftDistance,
+        // this.$fakeContent.width() + this.edgeDistance,
+        this.scale
+      );
       newMarginLeft = this.elementMarginLeft - this.edgeDistance;
 
       $(element).css({ marginLeft: newMarginLeft });
@@ -144,8 +171,8 @@ function throttle(fn, wait) {
     }
     if (scrollToLeft) {
       scrollWrapper.scrollTo(
-        scrollLeft - this.scrollStep + (adjustLeft ? this.edgeDistance : 0),
-        scrollTop
+        scrollLeft - ((this.scrollStep + (adjustLeft ? this.edgeDistance : 0))),
+        scrollTop / this.scale
       );
     }
 
@@ -156,13 +183,18 @@ function throttle(fn, wait) {
       scrollWrapper.scrollTo(scrollLeft + this.scrollStep, scrollTop);
     }
 
-    if (adjustBottom) {
-      this.$fakeContent.height(this.$fakeContent.height() + this.edgeDistance);
-    }
-    if (scrollToBottom) {
-      scrollWrapper.scrollTo(scrollLeft, scrollTop + this.scrollStep);
-    }
+    // if (adjustBottom) {
+    //   this.$fakeContent.height(this.$fakeContent.height() + this.edgeDistance);
+    // }
+    // if (scrollToBottom) {
+    //   scrollWrapper.scrollTo(scrollLeft, scrollTop + this.scrollStep);
+    // }
   };
+
+  InfiniteSpace.prototype.update = function (data) {
+    this.scale = data.scale || this.scale;
+  };
+
 
   InfiniteSpace.prototype.handleDrop = function (element) {
     var $element = $(element),
@@ -187,6 +219,7 @@ function throttle(fn, wait) {
       contentSize: this.$content.size(),
       fakeContentSize: this.$fakeContent.size(),
       wrapperSize: this.$wrapper.size(),
+      scale: this.scale,
       scroll: {
         left: scrollLeft,
         top: scrollTop,
@@ -214,6 +247,7 @@ function throttle(fn, wait) {
     this.getMaxBottom = this.data.getMaxBottom || this.defaultData.getMaxBottom;
     this.fakeContentSize = this.data.fakeContentSize || this.defaultData.fakeContentSize;
     this.contentSize = this.data.contentSize || this.defaultData.contentSize;
+    this.scale = this.data.scale || this.defaultData.scale;
 
     this.onSpaceChange = typeof this.data.onSpaceChange === "function" ?
                             this.data.onSpaceChange :
@@ -226,6 +260,8 @@ function throttle(fn, wait) {
     
     this.centers = getScrollCenters(this.wrapper);
     this.lastCenters = this.centers;
+    this.lastPosition = [0, 0];
+    this.lastCall = new Date().getTime();
     
     (this.isBody ? document.documentElement : this.wrapper).scrollTo(
       this.lastCenters.x,
