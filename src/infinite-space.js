@@ -175,8 +175,6 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
 
   InfiniteSpace.prototype.handleDrag = function (position, element) {
-    // console.log('InfiniteSpace.handleDrag.position', position);
-
     var now = new Date().getTime();
     
     if (now - this.lastCall < this.throttleMs){
@@ -233,32 +231,6 @@ if (typeof module !== 'undefined' && module.exports != null) {
       this.lastPosition = position || [0, 0];
       this.lastCall = now;
 
-
-    
-
-
-    // console.log('handleDrag',
-    //   '\n position', position,
-    //   '\n elementMarginLeft', this.elementMarginLeft,
-    //   '\n scrollLeft', scrollLeft,
-    //   '\n fakeContentPosition', fakeContentPosition,
-    //   '\n fakeContentWidth', fakeContentWidth,
-    //   '\n contentLeft', contentLeft,
-    //   '\n elementWidth', elementWidth,
-    //   '\n elementRightSide', elementRightSide,
-    //   '\n rightDistance', rightDistance,
-    //   '\n bottomDistance', bottomDistance,
-    //   '\n wrapperWidth', wrapperWidth,
-    //   '\n elementPosition', elementPosition,
-    //   '\n edgeDistance', this.edgeDistance,
-    //   '\n scrollToRight', scrollLeft / this.scale + (wrapperWidth / this.scale) - (position[0] + contentLeft + elementWidth) + this.elementMarginLeft,
-    //   '\n scrollToBottom', scrollTop / this.scale + (wrapperHeight / this.scale) - (position[1] + contentTop + elementHeight) + this.elementMarginTop,
-
-    // );
-
-    // console.log('leftDistance:', leftDistance);
-    // console.log('rightDistance:', adjustRight, rightDistance, '=', fakeContentPosition.left,'+', fakeContentWidth,'-', contentLeft, '-',elementRightSide);
-
     if (result.adjustTop) {
       var newMarginTop = 0;
       var height = this.$fakeContent.height();
@@ -288,15 +260,6 @@ if (typeof module !== 'undefined' && module.exports != null) {
       this.$content.css({ left: (this.$content.position().left / this.scale + this.edgeDistance / this.scale) });
       console.log('adjustLeft', scrollLeft, this.lastPosition, position);
       
-      // console.log(
-      //   "newleft:",
-      //   "\n  contentLeft:",contentLeft,
-      //   "\n  left:",left,
-      //   "\n  leftDistance:",leftDistance,
-      //   "\n  $fakeContent.width():", this.$fakeContent.width(),
-      //   // this.$fakeContent.width() + this.edgeDistance,
-      //   "\n  scale:",this.scale
-      // );
       newMarginLeft = this.elementMarginLeft - this.edgeDistance / this.scale;
 
       $(element).css({ marginLeft: newMarginLeft});
@@ -310,14 +273,6 @@ if (typeof module !== 'undefined' && module.exports != null) {
     }
 
     if (result.adjustRight) {
-      // console.log(
-      //   "newright:",
-      //   "\n  contentLeft:", contentLeft * this.scale,
-      //   "\n  left:", left / this.scale,
-      //   "\n  $fakeContent.width():", this.$fakeContent.width(),
-      //   "\n  scale:", this.scale,
-      //   "\n  rightDistance:", rightDistance,
-      // );
       console.log('adjustRight', scrollLeft, this.lastPosition, position);
       this.$fakeContent.width(this.$fakeContent.width() + this.edgeDistance * 2);
     }

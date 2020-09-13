@@ -5,7 +5,7 @@ let $ = jQuery(window);
 global.$ = $;
 global.jQuery = $;
 
-var InfiniteSpace = require('../infinite-space.js');
+var InfiniteSpace = require('../src/infinite-space.js');
 
 var assert = require('assert');
 
