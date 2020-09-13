@@ -23,7 +23,7 @@
   "scripts": {
     "test": "mocha",
     "build": "gulp",
-    "build_docs": "documentation build ./src/infinite-space.js -f md > docs.md"
+    "build_docs": "documentation build ./src/infinite-space.js -f md > ./docs/main.md"
   },
   "repository": {
     "type": "git",
