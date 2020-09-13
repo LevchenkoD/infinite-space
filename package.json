@@ -7,6 +7,7 @@
     "test": "test"
   },
   "dependencies": {
+    "documentation": "^13.0.2",
     "dotenv": "^8.2.0",
     "gulp": "^4.0.2"
   },
@@ -21,7 +22,8 @@
   },
   "scripts": {
     "test": "mocha",
-    "build": "gulp"
+    "build": "gulp",
+    "build_docs": "documentation build ./src/infinite-space.js -f md > docs.md"
   },
   "repository": {
     "type": "git",
