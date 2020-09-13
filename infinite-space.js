@@ -8,6 +8,81 @@ function throttle(fn, wait) {
   };
 }
 
+function calculateDrag(options) {
+  /**
+     * @param {array} position - drag position array [x,y]
+     * @param {array} lastPosition - previous drag position array [x,y]
+     * @param {number} scale - wrapper scale
+     * @param {number} edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
+     * @param {number} scrollLeft - wrapper scrollLeft
+     * @param {number} scrollTop - wrapper scrollTop
+     * @param {number} wrapperWidth - wrapper width.
+     * @param {number} wrapperHeight - wrapper height.
+     * @param {object} contentPosition - content position()
+     * @param {number} contentWidth - content width
+     * @param {number} contentHeight - content height
+     * @param {object} fakeContentPosition - fake content position()
+     * @param {number} fakeContentWidth - fake content width
+     * @param {number} fakeContentHeight - fake content height
+     * @param {number} elementHeight - element height
+     * @param {number} elementWidth - element width
+     * @param {number} elementWidth - element width
+     * @param {number} elementPosition - element position()
+     * @param {number} elementMarginTop - element margin top
+     * @param {number} elementMarginLeft - element margin left
+    */
+
+  var top = options.position[1] + options.elementMarginTop,
+    left = options.position[0] + options.elementMarginLeft,
+    elementLeft = options.elementPosition.left / options.scale,
+    elementTop = options.elementPosition.top / options.scale,
+    elementRightSide = elementLeft + options.elementWidth,
+    elementBottomSide = elementTop + options.elementHeight,
+    contentLeft = options.contentPosition.left / options.scale,
+    contentTop = options.contentPosition.top / options.scale,
+
+    topDistance = contentTop + top,
+
+    isMovingToTop = options.lastPosition[1] > options.position[1],
+    topDistance = contentTop + top,
+    adjustTop = isMovingToTop && options.fakeContentPosition.top + topDistance <= options.edgeDistance,
+    scrollToTop = isMovingToTop && contentTop + top <= options.scrollTop / options.scale + options.edgeDistance,
+
+    isMovingToBottom = options.lastPosition[1] < options.position[1],
+    bottomDistance = options.fakeContentPosition.top + options.fakeContentHeight - contentTop - elementBottomSide,
+    adjustBottom = isMovingToBottom && options.edgeDistance >= bottomDistance,
+    scrollToBottom = isMovingToBottom && options.scrollTop / options.scale + (options.wrapperHeight / options.scale) - (options.position[1] + contentTop + options.elementHeight) - options.elementMarginTop < options.edgeDistance,
+    
+    isMovingToLeft = options.lastPosition[0] > options.position[0],
+    leftDistance = contentLeft + left,
+    adjustLeft = isMovingToLeft && options.fakeContentPosition.left + leftDistance <= options.edgeDistance,
+    scrollToLeft = isMovingToLeft && contentLeft + left <= options.scrollLeft / options.scale + options.edgeDistance,
+
+    isMovingToRight = options.lastPosition[0] < options.position[0],
+    rightDistance = options.fakeContentPosition.left + options.fakeContentWidth - contentLeft - elementRightSide,
+    adjustRight = isMovingToRight && options.edgeDistance >= rightDistance,
+    scrollToRight = isMovingToRight && options.scrollLeft / options.scale + (options.wrapperWidth / options.scale) - (options.position[0] + contentLeft + options.elementWidth) - options.elementMarginLeft < options.edgeDistance;
+   
+  return {
+    adjustTop: adjustTop,
+    scrollToTop: scrollToTop,
+
+    adjustBottom: adjustBottom,
+    scrollToBottom: scrollToBottom,
+
+    adjustLeft: adjustLeft,
+    scrollToLeft: scrollToLeft,
+    leftDistance: leftDistance,
+
+    adjustRight: adjustRight,
+    scrollToRight: scrollToRight,
+  };
+};
+
+if (typeof module !== 'undefined' && module.exports != null) {
+  exports.calculateDrag = calculateDrag;
+}
+
 (function ($) {
   "use strict";
 
@@ -38,8 +113,8 @@ function throttle(fn, wait) {
       wrapper: ".wrapper",
       fakeContent: ".scroll-fake-content",
       content: ".content",
-      throttleMs: 50,
-      edgeDistance: 50,
+      throttleMs: 200,
+      edgeDistance: 100,
       scrollStep: 100, //px
       fakeContentSize: null,
       scale: 1,
@@ -94,6 +169,11 @@ function throttle(fn, wait) {
     });
   };
 
+
+  
+
+
+
   InfiniteSpace.prototype.handleDrag = function (position, element) {
     // console.log('InfiniteSpace.handleDrag.position', position);
 
@@ -105,90 +185,155 @@ function throttle(fn, wait) {
 
     var wrapperWidth = this.isBody ? $(window).width() : this.$wrapper.width(),
       wrapperHeight = this.isBody ? $(window).height() : this.$wrapper.height(),
-      fakeContentCenter = getCenter(this.$fakeContent),
-      top = position[1] + this.elementMarginTop,
-      left = position[0] + this.elementMarginLeft,
-      contentLeft = this.$content.position().left,
-      contentTop = this.$content.position().top,
-
-      scrollWrapper = this.isBody ? window : this.wrapper,
       
+      fakeContentPosition = this.$fakeContent.position(),
+      fakeContentWidth = this.$fakeContent.width(),
+      fakeContentHeight = this.$fakeContent.height(),
+      elementWidth = $(element).width(),
+      elementHeight = $(element).height(),
+      elementPosition = $(element).position(),
+      
+      scrollWrapper = this.isBody ? window : this.wrapper,
       scrollLeft = Math.max(scrollWrapper.scrollLeft || scrollWrapper.scrollX),
       scrollTop = Math.max(scrollWrapper.scrollTop || scrollWrapper.scrollY),
-     
-      topDistance = contentTop + top,
-      adjustTop = contentTop + top <= this.edgeDistance,
-      scrollToTop = contentTop + top <= scrollTop + this.edgeDistance,
-      
-      bottomDistance = this.$fakeContent.height() - (contentTop + top),
-      adjustBottom = this.edgeDistance >= bottomDistance,
-      scrollToBottom = contentTop + top >= wrapperHeight + scrollTop - this.edgeDistance,
-      
-      leftDistance = contentLeft + left * this.scale,
-      adjustLeft = this.lastPosition[0] > position[0] && leftDistance <= this.edgeDistance - this.edgeDistance / this.scale,
-      scrollToLeft = contentLeft + left <= scrollLeft + this.edgeDistance,
-     
-      rightDistance = this.$fakeContent.width() - (contentLeft + left),
-      adjustRight = this.lastPosition[0] < position[0] && this.edgeDistance >= rightDistance,
-      scrollToRight = contentLeft + left >= wrapperWidth + scrollLeft - this.edgeDistance;
+
+      contentPosition = this.$content.position(),
+      contentWidth = this.$content.width(),
+      contentHeight = this.$content.height(),
+    
+      result = calculateDrag({
+        position: position,
+        lastPosition: this.lastPosition,
+        scale: this.scale,
+        edgeDistance: this.edgeDistance,
+        
+        scrollLeft: scrollLeft,
+        scrollTop: scrollTop,
+        
+        wrapperWidth: wrapperWidth,
+        wrapperHeight: wrapperHeight,
+
+        contentPosition: contentPosition,
+        contentWidth: contentWidth,
+        contentHeight: contentHeight,
+
+        fakeContentPosition: fakeContentPosition,
+        fakeContentWidth: fakeContentWidth,
+        fakeContentHeight: fakeContentHeight,
+
+        elementPosition: elementPosition,
+        elementHeight: elementHeight,
+        elementWidth: elementWidth,
+        
+        elementMarginTop: this.elementMarginTop,
+        elementMarginLeft: this.elementMarginLeft,
+      });
+
 
       this.lastPosition = position || [0, 0];
       this.lastCall = now;
 
-    // if (adjustTop) {
-    //   var newMarginTop = 0;
-    //   this.$fakeContent.height(this.$fakeContent.height() + this.edgeDistance);
-    //   this.$content.css({ top: this.$content.position().top + this.edgeDistance });
-    //   newMarginTop = this.elementMarginTop - this.edgeDistance;
 
-    //   $(element).css({ marginTop: newMarginTop });
-    //   this.elementMarginTop = newMarginTop;
-    // }
-    // if (scrollToTop) {
-    //   scrollWrapper.scrollTo(
-    //     scrollLeft,
-    //     scrollTop - this.scrollStep + (adjustTop ? this.edgeDistance : 0)
-    //   );
-    // }
+    
 
-    if (adjustLeft) {
-      var newMarginLeft = 0;
-      
-      this.$fakeContent.width(this.$fakeContent.width() + (this.edgeDistance - this.edgeDistance / this.scale));
-      this.$content.css({ left: this.$content.position().left / this.scale + (this.edgeDistance)});
-      console.log(
-        "newleft",
-        contentLeft,
-        left,
-        leftDistance,
-        // this.$fakeContent.width() + this.edgeDistance,
-        this.scale
+
+    // console.log('handleDrag',
+    //   '\n position', position,
+    //   '\n elementMarginLeft', this.elementMarginLeft,
+    //   '\n scrollLeft', scrollLeft,
+    //   '\n fakeContentPosition', fakeContentPosition,
+    //   '\n fakeContentWidth', fakeContentWidth,
+    //   '\n contentLeft', contentLeft,
+    //   '\n elementWidth', elementWidth,
+    //   '\n elementRightSide', elementRightSide,
+    //   '\n rightDistance', rightDistance,
+    //   '\n bottomDistance', bottomDistance,
+    //   '\n wrapperWidth', wrapperWidth,
+    //   '\n elementPosition', elementPosition,
+    //   '\n edgeDistance', this.edgeDistance,
+    //   '\n scrollToRight', scrollLeft / this.scale + (wrapperWidth / this.scale) - (position[0] + contentLeft + elementWidth) + this.elementMarginLeft,
+    //   '\n scrollToBottom', scrollTop / this.scale + (wrapperHeight / this.scale) - (position[1] + contentTop + elementHeight) + this.elementMarginTop,
+
+    // );
+
+    // console.log('leftDistance:', leftDistance);
+    // console.log('rightDistance:', adjustRight, rightDistance, '=', fakeContentPosition.left,'+', fakeContentWidth,'-', contentLeft, '-',elementRightSide);
+
+    if (result.adjustTop) {
+      var newMarginTop = 0;
+      var height = this.$fakeContent.height();
+
+      console.log('adjustTop', scrollTop, this.lastPosition, position);
+
+      this.$fakeContent.height(height + this.edgeDistance / this.scale);
+      this.$content.css({ top: this.$content.position().top / this.scale + this.edgeDistance / this.scale});
+
+      newMarginTop = this.elementMarginTop - this.edgeDistance / this.scale;
+
+      $(element).css({ marginTop: newMarginTop });
+      this.elementMarginTop = newMarginTop;
+    }
+    if (result.scrollToTop) {
+      scrollWrapper.scrollTo(
+        scrollLeft,
+        scrollTop - this.scrollStep + (result.adjustTop ? this.edgeDistance : 0)
       );
-      newMarginLeft = this.elementMarginLeft - this.edgeDistance;
+    }
 
-      $(element).css({ marginLeft: newMarginLeft });
+    if (result.adjustLeft) {
+      var newMarginLeft = 0;
+      var width = this.$fakeContent.width();
+
+      this.$fakeContent.width(width + this.edgeDistance / this.scale);
+      this.$content.css({ left: (this.$content.position().left / this.scale + this.edgeDistance / this.scale) });
+      console.log('adjustLeft', scrollLeft, this.lastPosition, position);
+      
+      // console.log(
+      //   "newleft:",
+      //   "\n  contentLeft:",contentLeft,
+      //   "\n  left:",left,
+      //   "\n  leftDistance:",leftDistance,
+      //   "\n  $fakeContent.width():", this.$fakeContent.width(),
+      //   // this.$fakeContent.width() + this.edgeDistance,
+      //   "\n  scale:",this.scale
+      // );
+      newMarginLeft = this.elementMarginLeft - this.edgeDistance / this.scale;
+
+      $(element).css({ marginLeft: newMarginLeft});
       this.elementMarginLeft = newMarginLeft;
     }
-    if (scrollToLeft) {
+    if (result.scrollToLeft) {
       scrollWrapper.scrollTo(
-        scrollLeft - ((this.scrollStep + (adjustLeft ? this.edgeDistance : 0))),
-        scrollTop / this.scale
+        (scrollLeft - (this.scrollStep + (result.adjustLeft ? this.edgeDistance: 0))) ,
+        scrollTop
       );
     }
 
-    if (adjustRight) {
-      this.$fakeContent.width(this.$fakeContent.width() + this.edgeDistance);
+    if (result.adjustRight) {
+      // console.log(
+      //   "newright:",
+      //   "\n  contentLeft:", contentLeft * this.scale,
+      //   "\n  left:", left / this.scale,
+      //   "\n  $fakeContent.width():", this.$fakeContent.width(),
+      //   "\n  scale:", this.scale,
+      //   "\n  rightDistance:", rightDistance,
+      // );
+      console.log('adjustRight', scrollLeft, this.lastPosition, position);
+      this.$fakeContent.width(this.$fakeContent.width() + this.edgeDistance * 2);
     }
-    if (scrollToRight) {
+    if (result.scrollToRight) {
+      console.log('scrollRight', scrollLeft, this.lastPosition, position);
       scrollWrapper.scrollTo(scrollLeft + this.scrollStep, scrollTop);
     }
 
-    // if (adjustBottom) {
-    //   this.$fakeContent.height(this.$fakeContent.height() + this.edgeDistance);
-    // }
-    // if (scrollToBottom) {
-    //   scrollWrapper.scrollTo(scrollLeft, scrollTop + this.scrollStep);
-    // }
+    if (result.adjustBottom) {
+      console.log('adjustBottom', scrollTop, this.lastPosition, position);
+      this.$fakeContent.height(this.$fakeContent.height() + this.edgeDistance);
+    }
+    if (result.scrollToBottom) {
+      console.log('scrollToBottom', scrollTop, this.lastPosition, position);
+      scrollWrapper.scrollTo(scrollLeft, scrollTop + this.scrollStep);
+    }
   };
 
   InfiniteSpace.prototype.update = function (data) {
@@ -200,7 +345,7 @@ function throttle(fn, wait) {
     var $element = $(element),
       position = $element.position(),
       newTop = position.top + this.elementMarginTop,
-      newLeft = position.top + this.elementMarginLeft,
+      newLeft = position.left + this.elementMarginLeft,
       scrollWrapper = this.isBody ? window : this.wrapper,
       scrollLeft = Math.max(scrollWrapper.scrollLeft || scrollWrapper.scrollX),
       scrollTop = Math.max(scrollWrapper.scrollTop || scrollWrapper.scrollY);
