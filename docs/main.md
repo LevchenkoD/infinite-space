@@ -2,64 +2,133 @@
 
 ### Table of Contents
 
--   [scrollToRight][1]
+-   [calculateDrag][1]
     -   [Parameters][2]
--   [defaultData][3]
+-   [InfiniteSpace][3]
     -   [Parameters][4]
+    -   [handleDrag][5]
+        -   [Parameters][6]
+    -   [update][7]
+        -   [Parameters][8]
+    -   [handleDrop][9]
+        -   [Parameters][10]
+    -   [init][11]
+        -   [Parameters][12]
 
-## scrollToRight
+## calculateDrag
 
-### Parameters
-
--   `position` **[array][5]** drag position array [x,y]
--   `lastPosition` **[array][5]** previous drag position array [x,y]
--   `scale` **[number][6]** wrapper scale
--   `edgeDistance` **[number][6]** minimum distance to the edge of the `wrapper` to start resizing
--   `scrollLeft` **[number][6]** wrapper scrollLeft
--   `scrollTop` **[number][6]** wrapper scrollTop
--   `wrapperWidth` **[number][6]** wrapper width.
--   `wrapperHeight` **[number][6]** wrapper height.
--   `contentPosition` **[object][7]** content position()
--   `contentWidth` **[number][6]** content width
--   `contentHeight` **[number][6]** content height
--   `fakeContentPosition` **[object][7]** fake content position()
--   `fakeContentWidth` **[number][6]** fake content width
--   `fakeContentHeight` **[number][6]** fake content height
--   `elementHeight` **[number][6]** element height
--   `elementWidth` **[number][6]** element width
--   `elementWidth` **[number][6]** element width
--   `elementPosition` **[number][6]** element position()
--   `elementMarginTop` **[number][6]** element margin top
--   `elementMarginLeft` **[number][6]** element margin left
-
-## defaultData
+calculateDrag - calculate adjustments and repositions based on element position
 
 ### Parameters
 
--   `wrapper` **[string][8]** wrapper selector.
--   `fakeContentSize` **[object][7]** fake content dimentions
-    -   `fakeContentSize.width` **[number][6]** fake content width
-    -   `fakeContentSize.height` **[number][6]** fake content height
--   `content` **[string][8]** content selector.
--   `contentSize` **[object][7]** content dimentions
-    -   `contentSize.width` **[number][6]** content width
-    -   `contentSize.height` **[number][6]** content height
--   `edgeDistance` **[number][6]** minimum distance to the edge of the `wrapper` to start resizing
--   `scrollStep` **[number][6]** number of pixels that will be added to the `wrapper` size on each resize step
--   `scale` **[number][6]** wrapper transform scale [0,...,1]
+-   `options` **[object][13]** element options
+    -   `options.position` **[array][14]** drag position array [x,y]
+    -   `options.lastPosition` **[array][14]** previous drag position array [x,y]
+    -   `options.scale` **[number][15]** wrapper scale
+    -   `options.edgeDistance` **[number][15]** minimum distance to the edge of the `wrapper` to start resizing
+    -   `options.scrollLeft` **[number][15]** wrapper scrollLeft
+    -   `options.scrollTop` **[number][15]** wrapper scrollTop
+    -   `options.wrapperWidth` **[number][15]** wrapper width.
+    -   `options.wrapperHeight` **[number][15]** wrapper height.
+    -   `options.contentPosition` **[object][13]** content position()
+    -   `options.contentWidth` **[number][15]** content width
+    -   `options.contentHeight` **[number][15]** content height
+    -   `options.fakeContentPosition` **[object][13]** fake content position()
+    -   `options.fakeContentWidth` **[number][15]** fake content width
+    -   `options.fakeContentHeight` **[number][15]** fake content height
+    -   `options.elementHeight` **[number][15]** element height
+    -   `options.elementWidth` **[number][15]** element width
+    -   `options.elementWidth` **[number][15]** element width
+    -   `options.elementPosition` **[number][15]** element position()
+    -   `options.elementMarginTop` **[number][15]** element margin top
+    -   `options.elementMarginLeft` **[number][15]** element margin left
 
-[1]: #scrolltoright
+Returns **[object][13]** 
+
+## InfiniteSpace
+
+InfiniteSpace - expand parent size and scroll based on children position
+
+### Parameters
+
+-   `Data` **[Object][13]** instance initial data object.
+    -   `Data.wrapper` **[string][16]** wrapper selector.
+    -   `Data.fakeContentSize` **[object][13]** fake content dimentions
+        -   `Data.fakeContentSize.width` **[number][15]** fake content width
+        -   `Data.fakeContentSize.height` **[number][15]** fake content height
+    -   `Data.content` **[string][16]** content selector.
+    -   `Data.contentSize` **[object][13]** content dimentions
+        -   `Data.contentSize.width` **[number][15]** content width
+        -   `Data.contentSize.height` **[number][15]** content height
+    -   `Data.edgeDistance` **[number][15]** minimum distance to the edge of the `wrapper` to start resizing
+    -   `Data.scrollStep` **[number][15]** number of pixels that will be added to the `wrapper` size on each resize step
+    -   `Data.scale` **[number][15]** wrapper transform scale [0,...,1]
+
+### handleDrag
+
+handleDrag - handle new element position
+
+#### Parameters
+
+-   `position` **[array][14]** new position of dragged element
+-   `element` **[object][13]** dragged DOM element
+
+### update
+
+update - update instance with new data
+
+#### Parameters
+
+-   `data` **[object][13]** data object
+    -   `data.scale` **[number][15]** canvas scale [0,1] float
+
+### handleDrop
+
+handleDrop - handle element drag end event
+
+#### Parameters
+
+-   `element` **[object][13]** dragged DOM element
+
+### init
+
+-   **See: InfiniteSpace
+    **
+
+init - initialize instance and calculate defaults
+
+#### Parameters
+
+-   `Data` **[object][13]** data object
+
+[1]: #calculatedrag
 
 [2]: #parameters
 
-[3]: #defaultdata
+[3]: #infinitespace
 
 [4]: #parameters-1
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[5]: #handledrag
 
-[6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[6]: #parameters-2
 
-[7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[7]: #update
 
-[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[8]: #parameters-3
+
+[9]: #handledrop
+
+[10]: #parameters-4
+
+[11]: #init
+
+[12]: #parameters-5
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String

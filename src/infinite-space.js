@@ -8,30 +8,32 @@ function throttle(fn, wait) {
   };
 }
 
+/** 
+ * calculateDrag - calculate adjustments and repositions based on element position
+ * @param {object} options - element options
+ * @param {array} options.position - drag position array [x,y]
+ * @param {array} options.lastPosition - previous drag position array [x,y]
+ * @param {number} options.scale - wrapper scale
+ * @param {number} options.edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
+ * @param {number} options.scrollLeft - wrapper scrollLeft
+ * @param {number} options.scrollTop - wrapper scrollTop
+ * @param {number} options.wrapperWidth - wrapper width.
+ * @param {number} options.wrapperHeight - wrapper height.
+ * @param {object} options.contentPosition - content position()
+ * @param {number} options.contentWidth - content width
+ * @param {number} options.contentHeight - content height
+ * @param {object} options.fakeContentPosition - fake content position()
+ * @param {number} options.fakeContentWidth - fake content width
+ * @param {number} options.fakeContentHeight - fake content height
+ * @param {number} options.elementHeight - element height
+ * @param {number} options.elementWidth - element width
+ * @param {number} options.elementWidth - element width
+ * @param {number} options.elementPosition - element position()
+ * @param {number} options.elementMarginTop - element margin top
+ * @param {number} options.elementMarginLeft - element margin left
+ * @returns {object}
+*/
 function calculateDrag(options) {
-  /**
-     * @param {array} position - drag position array [x,y]
-     * @param {array} lastPosition - previous drag position array [x,y]
-     * @param {number} scale - wrapper scale
-     * @param {number} edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
-     * @param {number} scrollLeft - wrapper scrollLeft
-     * @param {number} scrollTop - wrapper scrollTop
-     * @param {number} wrapperWidth - wrapper width.
-     * @param {number} wrapperHeight - wrapper height.
-     * @param {object} contentPosition - content position()
-     * @param {number} contentWidth - content width
-     * @param {number} contentHeight - content height
-     * @param {object} fakeContentPosition - fake content position()
-     * @param {number} fakeContentWidth - fake content width
-     * @param {number} fakeContentHeight - fake content height
-     * @param {number} elementHeight - element height
-     * @param {number} elementWidth - element width
-     * @param {number} elementWidth - element width
-     * @param {number} elementPosition - element position()
-     * @param {number} elementMarginTop - element margin top
-     * @param {number} elementMarginLeft - element margin left
-    */
-
   var top = options.position[1] + options.elementMarginTop,
     left = options.position[0] + options.elementMarginLeft,
     elementLeft = options.elementPosition.left / options.scale,
@@ -94,20 +96,22 @@ if (typeof module !== 'undefined' && module.exports != null) {
     };
   }
 
+  /**
+   * InfiniteSpace - expand parent size and scroll based on children position
+   * @param {Object} Data - instance initial data object.
+   * @param {string} Data.wrapper - wrapper selector.
+   * @param {object} Data.fakeContentSize - fake content dimentions
+   * @param {number} Data.fakeContentSize.width - fake content width
+   * @param {number} Data.fakeContentSize.height - fake content height
+   * @param {string} Data.content - content selector.
+   * @param {object} Data.contentSize - content dimentions
+   * @param {number} Data.contentSize.width - content width
+   * @param {number} Data.contentSize.height - content height
+   * @param {number} Data.edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
+   * @param {number} Data.scrollStep - number of pixels that will be added to the `wrapper` size on each resize step
+   * @param {number} Data.scale - wrapper transform scale [0,...,1]
+  */
   var InfiniteSpace = function (Data) {
-    /**
-     * @param {string} wrapper - wrapper selector.
-     * @param {object} fakeContentSize - fake content dimentions
-     * @param {number} fakeContentSize.width - fake content width
-     * @param {number} fakeContentSize.height - fake content height
-     * @param {string} content - content selector.
-     * @param {object} contentSize - content dimentions
-     * @param {number} contentSize.width - content width
-     * @param {number} contentSize.height - content height
-     * @param {number} edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
-     * @param {number} scrollStep - number of pixels that will be added to the `wrapper` size on each resize step
-     * @param {number} scale - wrapper transform scale [0,...,1]
-    */
 
     this.defaultData = {
       wrapper: ".wrapper",
@@ -173,7 +177,11 @@ if (typeof module !== 'undefined' && module.exports != null) {
   
 
 
-
+  /**
+   * handleDrag - handle new element position
+   * @param {array} position - new position of dragged element
+   * @param {object} element - dragged DOM element
+  */
   InfiniteSpace.prototype.handleDrag = function (position, element) {
     var now = new Date().getTime();
     
@@ -291,11 +299,19 @@ if (typeof module !== 'undefined' && module.exports != null) {
     }
   };
 
+  /**
+   * update - update instance with new data
+   * @param {object} data - data object
+   * @param {number} data.scale - canvas scale [0,1] float
+  */
   InfiniteSpace.prototype.update = function (data) {
     this.scale = data.scale || this.scale;
   };
 
-
+  /**
+   * handleDrop - handle element drag end event
+   * @param {object} element - dragged DOM element
+  */
   InfiniteSpace.prototype.handleDrop = function (element) {
     var $element = $(element),
       position = $element.position(),
@@ -327,6 +343,11 @@ if (typeof module !== 'undefined' && module.exports != null) {
     });
   };
 
+  /**
+   * init - initialize instance and calculate defaults
+   * @param {object} Data - data object
+   * @see InfiniteSpace
+  */
   InfiniteSpace.prototype.init = function (Data) {
     this.data = Data || this.defaultData;
     this.$wrapper = $(this.data.wrapper || this.defaultData.wrapper);
