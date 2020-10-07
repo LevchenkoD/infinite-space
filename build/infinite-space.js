@@ -8,30 +8,33 @@ function throttle(fn, wait) {
   };
 }
 
+/** 
+ * calculateDrag - calculate adjustments and repositions based on element position
+ * @param {object} options - element options
+ * @param {array} options.position - drag position array [x,y]
+ * @param {array} options.lastPosition - previous drag position array [x,y]
+ * @param {number} options.scale - wrapper scale
+ * @param {number} options.edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
+ * @param {number} options.scrollLeft - wrapper scrollLeft
+ * @param {number} options.scrollTop - wrapper scrollTop
+ * @param {number} options.wrapperWidth - wrapper width.
+ * @param {number} options.wrapperHeight - wrapper height.
+ * @param {object} options.contentPosition - content position()
+ * @param {number} options.contentWidth - content width
+ * @param {number} options.contentHeight - content height
+ * @param {object} options.fakeContentPosition - fake content position()
+ * @param {object} options.padding - canvas padding. @see InfiniteSpace
+ * @param {number} options.fakeContentWidth - fake content width
+ * @param {number} options.fakeContentHeight - fake content height
+ * @param {number} options.elementHeight - element height
+ * @param {number} options.elementWidth - element width
+ * @param {number} options.elementWidth - element width
+ * @param {number} options.elementPosition - element position()
+ * @param {number} options.elementMarginTop - element margin top
+ * @param {number} options.elementMarginLeft - element margin left
+ * @returns {object}
+*/
 function calculateDrag(options) {
-  /**
-     * @param {array} position - drag position array [x,y]
-     * @param {array} lastPosition - previous drag position array [x,y]
-     * @param {number} scale - wrapper scale
-     * @param {number} edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
-     * @param {number} scrollLeft - wrapper scrollLeft
-     * @param {number} scrollTop - wrapper scrollTop
-     * @param {number} wrapperWidth - wrapper width.
-     * @param {number} wrapperHeight - wrapper height.
-     * @param {object} contentPosition - content position()
-     * @param {number} contentWidth - content width
-     * @param {number} contentHeight - content height
-     * @param {object} fakeContentPosition - fake content position()
-     * @param {number} fakeContentWidth - fake content width
-     * @param {number} fakeContentHeight - fake content height
-     * @param {number} elementHeight - element height
-     * @param {number} elementWidth - element width
-     * @param {number} elementWidth - element width
-     * @param {number} elementPosition - element position()
-     * @param {number} elementMarginTop - element margin top
-     * @param {number} elementMarginLeft - element margin left
-    */
-
   var top = options.position[1] + options.elementMarginTop,
     left = options.position[0] + options.elementMarginLeft,
     elementLeft = options.elementPosition.left / options.scale,
@@ -44,7 +47,7 @@ function calculateDrag(options) {
     topDistance = contentTop + top,
 
     isMovingToTop = options.lastPosition[1] > options.position[1],
-    topDistance = contentTop + top,
+    topDistance = contentTop + top + options.padding.top,
     adjustTop = isMovingToTop && options.fakeContentPosition.top + topDistance <= options.edgeDistance,
     scrollToTop = isMovingToTop && contentTop + top <= options.scrollTop / options.scale + options.edgeDistance,
 
@@ -54,7 +57,7 @@ function calculateDrag(options) {
     scrollToBottom = isMovingToBottom && options.scrollTop / options.scale + (options.wrapperHeight / options.scale) - (options.position[1] + contentTop + options.elementHeight) - options.elementMarginTop < options.edgeDistance,
     
     isMovingToLeft = options.lastPosition[0] > options.position[0],
-    leftDistance = contentLeft + left,
+    leftDistance = contentLeft + left + options.padding.left,
     adjustLeft = isMovingToLeft && options.fakeContentPosition.left + leftDistance <= options.edgeDistance,
     scrollToLeft = isMovingToLeft && contentLeft + left <= options.scrollLeft / options.scale + options.edgeDistance,
 
@@ -94,20 +97,28 @@ if (typeof module !== 'undefined' && module.exports != null) {
     };
   }
 
+  /**
+   * InfiniteSpace - expand parent size and scroll based on children position
+   * @param {Object} Data - instance initial data object.
+   * @param {string} Data.wrapper - wrapper selector.
+   * @param {object} Data.fakeContentSize - fake content dimentions
+   * @param {number} Data.fakeContentSize.width - fake content width
+   * @param {number} Data.fakeContentSize.height - fake content height
+   * @param {string} Data.content - content selector.
+   * @param {object} Data.contentSize - content dimentions
+   * @param {number} Data.contentSize.width - content width
+   * @param {number} Data.contentSize.height - content height
+   * @param {number} Data.onChange [] - fires after space adjust
+   * @param {number} Data.edgeDistance [100] - minimum distance to the edge of the `wrapper` to start resizing
+   * @param {number} Data.scrollStep [100] - number of pixels that will be added to the `wrapper` size on each resize step
+   * @param {number} Data.scale [1] - wrapper transform scale [0,...,1]
+   * @param {object} Data.padding [{}] - force padding in calculations. 
+   *                                      Makes sence when canvas placed not on x:0,y:0
+   * @param {number} Data.padding.top [0] - top padding 
+   * @param {number} Data.padding.left [0] - left padding 
+   * @param {boolean} Data.disallowNegativePosition [false] - if `true` then adjusting to *top* and *left* is forbidden
+  */
   var InfiniteSpace = function (Data) {
-    /**
-     * @param {string} wrapper - wrapper selector.
-     * @param {object} fakeContentSize - fake content dimentions
-     * @param {number} fakeContentSize.width - fake content width
-     * @param {number} fakeContentSize.height - fake content height
-     * @param {string} content - content selector.
-     * @param {object} contentSize - content dimentions
-     * @param {number} contentSize.width - content width
-     * @param {number} contentSize.height - content height
-     * @param {number} edgeDistance - minimum distance to the edge of the `wrapper` to start resizing
-     * @param {number} scrollStep - number of pixels that will be added to the `wrapper` size on each resize step
-     * @param {number} scale - wrapper transform scale [0,...,1]
-    */
 
     this.defaultData = {
       wrapper: ".wrapper",
@@ -173,7 +184,11 @@ if (typeof module !== 'undefined' && module.exports != null) {
   
 
 
-
+  /**
+   * handleDrag - handle new element position
+   * @param {array} position - new position of dragged element
+   * @param {object} element - dragged DOM element
+  */
   InfiniteSpace.prototype.handleDrag = function (position, element) {
     var now = new Date().getTime();
     
@@ -204,7 +219,8 @@ if (typeof module !== 'undefined' && module.exports != null) {
         lastPosition: this.lastPosition,
         scale: this.scale,
         edgeDistance: this.edgeDistance,
-        
+        padding: this.padding,
+
         scrollLeft: scrollLeft,
         scrollTop: scrollTop,
         
@@ -231,7 +247,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
       this.lastPosition = position || [0, 0];
       this.lastCall = now;
 
-    if (result.adjustTop) {
+    if (!this.disallowNegativePosition && result.adjustTop) {
       var newMarginTop = 0;
       var height = this.$fakeContent.height();
 
@@ -252,7 +268,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
       );
     }
 
-    if (result.adjustLeft) {
+    if (!this.disallowNegativePosition && result.adjustLeft) {
       var newMarginLeft = 0;
       var width = this.$fakeContent.width();
 
@@ -291,11 +307,19 @@ if (typeof module !== 'undefined' && module.exports != null) {
     }
   };
 
+  /**
+   * update - update instance with new data
+   * @param {object} data - data object
+   * @param {number} data.scale - canvas scale [0,1] float
+  */
   InfiniteSpace.prototype.update = function (data) {
     this.scale = data.scale || this.scale;
   };
 
-
+  /**
+   * handleDrop - handle element drag end event
+   * @param {object} element - dragged DOM element
+  */
   InfiniteSpace.prototype.handleDrop = function (element) {
     var $element = $(element),
       position = $element.position(),
@@ -315,7 +339,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
     this.elementMarginTop = 0;
     this.elementMarginLeft = 0;
 
-    this.onSpaceChange({
+    this.onChange({
       contentSize: this.$content.size(),
       fakeContentSize: this.$fakeContent.size(),
       wrapperSize: this.$wrapper.size(),
@@ -327,6 +351,11 @@ if (typeof module !== 'undefined' && module.exports != null) {
     });
   };
 
+  /**
+   * init - initialize instance and calculate defaults
+   * @param {object} Data - data object
+   * @see InfiniteSpace
+  */
   InfiniteSpace.prototype.init = function (Data) {
     this.data = Data || this.defaultData;
     this.$wrapper = $(this.data.wrapper || this.defaultData.wrapper);
@@ -348,9 +377,23 @@ if (typeof module !== 'undefined' && module.exports != null) {
     this.fakeContentSize = this.data.fakeContentSize || this.defaultData.fakeContentSize;
     this.contentSize = this.data.contentSize || this.defaultData.contentSize;
     this.scale = this.data.scale || this.defaultData.scale;
+    this.disallowNegativePosition = typeof this.data.disallowNegativePosition === 'boolean' ? 
+                                      this.data.disallowNegativePosition : 
+                                      false;
 
-    this.onSpaceChange = typeof this.data.onSpaceChange === "function" ?
-                            this.data.onSpaceChange :
+    this.padding = {top: 0, left: 0};
+
+    if(typeof Data.padding === 'object') {
+      if(typeof Data.padding.top === 'number'){
+        this.padding.top = Data.padding.top; 
+      }
+      if(typeof Data.padding.left === 'number'){
+        this.padding.left = Data.padding.left; 
+      }
+    }
+
+    this.onChange = typeof this.data.onChange === "function" ?
+                            this.data.onChange :
                             function(){};
 
     this.elementMarginTop = 0;

@@ -34,6 +34,7 @@ calculateDrag - calculate adjustments and repositions based on element position
     -   `options.contentWidth` **[number][15]** content width
     -   `options.contentHeight` **[number][15]** content height
     -   `options.fakeContentPosition` **[object][13]** fake content position()
+    -   `options.padding` **[object][13]** canvas padding. @see InfiniteSpace
     -   `options.fakeContentWidth` **[number][15]** fake content width
     -   `options.fakeContentHeight` **[number][15]** fake content height
     -   `options.elementHeight` **[number][15]** element height
@@ -60,9 +61,15 @@ InfiniteSpace - expand parent size and scroll based on children position
     -   `Data.contentSize` **[object][13]** content dimentions
         -   `Data.contentSize.width` **[number][15]** content width
         -   `Data.contentSize.height` **[number][15]** content height
-    -   `Data.edgeDistance` **[number][15]** minimum distance to the edge of the `wrapper` to start resizing
-    -   `Data.scrollStep` **[number][15]** number of pixels that will be added to the `wrapper` size on each resize step
-    -   `Data.scale` **[number][15]** wrapper transform scale [0,...,1]
+    -   `Data.onChange` **[number][15]** \[] - fires after space adjust
+    -   `Data.edgeDistance` **[number][15]** [100] - minimum distance to the edge of the `wrapper` to start resizing
+    -   `Data.scrollStep` **[number][15]** [100] - number of pixels that will be added to the `wrapper` size on each resize step
+    -   `Data.scale` **[number][15]** [1] - wrapper transform scale [0,...,1]
+    -   `Data.padding` **[object][13]** [{}] - force padding in calculations. 
+                                             Makes sence when canvas placed not on x:0,y:0
+        -   `Data.padding.top` **[number][15]** [0] - top padding
+        -   `Data.padding.left` **[number][15]** [0] - left padding
+    -   `Data.disallowNegativePosition` **[boolean][17]** [false] - if `true` then adjusting to _top_ and _left_ is forbidden
 
 ### handleDrag
 
@@ -132,3 +139,5 @@ init - initialize instance and calculate defaults
 [15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
 [16]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean

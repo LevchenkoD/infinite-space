@@ -7,7 +7,7 @@ const minify = require('gulp-minify');
 gulp.task('remove-logging', function () {
     return gulp
       .src([
-          'src/**/*.js'      ])
+          'src/**/*.js'])
       .pipe(
         gulp_remove_logging({
           // Options (optional)
@@ -21,13 +21,12 @@ gulp.task('remove-logging', function () {
 gulp.task('minify-js', function(){
     return gulp.src('build/**/*.js')
             .pipe(minify({
-              ignoreFiles: ['*.min.js', '*-min.js', '*.bundle.js'],
               ext: {
-
-                  min:'.min.js'
-              }
+                min:'.min.js'
+              },
+              ignoreFiles: ['-min.js'],
             }))
-            .pipe(gulp.dest('build', { sourcemaps: true }));;
+            .pipe(gulp.dest('build', { sourcemaps: true }));
 });
   
 
