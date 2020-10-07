@@ -47,8 +47,8 @@ function calculateDrag(options) {
     topDistance = contentTop + top,
 
     isMovingToTop = options.lastPosition[1] > options.position[1],
-    topDistance = contentTop + top + options.padding.top,
-    adjustTop = isMovingToTop && options.fakeContentPosition.top + topDistance <= options.edgeDistance,
+    topDistance = contentTop + top,
+    adjustTop = isMovingToTop && options.fakeContentPosition.top + topDistance <= options.edgeDistance + options.padding.top,
     scrollToTop = isMovingToTop && contentTop + top <= options.scrollTop / options.scale + options.edgeDistance,
 
     isMovingToBottom = options.lastPosition[1] < options.position[1],
@@ -57,8 +57,8 @@ function calculateDrag(options) {
     scrollToBottom = isMovingToBottom && options.scrollTop / options.scale + (options.wrapperHeight / options.scale) - (options.position[1] + contentTop + options.elementHeight) - options.elementMarginTop < options.edgeDistance,
     
     isMovingToLeft = options.lastPosition[0] > options.position[0],
-    leftDistance = contentLeft + left + options.padding.left,
-    adjustLeft = isMovingToLeft && options.fakeContentPosition.left + leftDistance <= options.edgeDistance,
+    leftDistance = contentLeft + left,
+    adjustLeft = isMovingToLeft && options.fakeContentPosition.left + leftDistance <= options.edgeDistance + options.padding.left,
     scrollToLeft = isMovingToLeft && contentLeft + left <= options.scrollLeft / options.scale + options.edgeDistance,
 
     isMovingToRight = options.lastPosition[0] < options.position[0],
@@ -321,7 +321,8 @@ if (typeof module !== 'undefined' && module.exports != null) {
    * @param {object} element - dragged DOM element
   */
   InfiniteSpace.prototype.handleDrop = function (element) {
-    var $element = $(element),
+    var self = this,
+      $element = $(element),
       position = $element.position(),
       newTop = position.top + this.elementMarginTop,
       newLeft = position.left + this.elementMarginLeft,
@@ -336,14 +337,32 @@ if (typeof module !== 'undefined' && module.exports != null) {
       marginLeft: 0,
     });
 
-    this.elementMarginTop = 0;
-    this.elementMarginLeft = 0;
-
-    this.onChange({
-      contentSize: this.$content.size(),
-      fakeContentSize: this.$fakeContent.size(),
-      wrapperSize: this.$wrapper.size(),
-      scale: this.scale,
+    self.elementMarginTop = 0;
+    self.elementMarginLeft = 0;
+    // console.log('onSpaceChange.pre', self.$content, self.$content.size());
+    self.onChange({
+      content: {
+        size: {
+          width: self.$content.width(),
+          height: self.$content.height()
+        },
+        position: self.$content.position()
+      },
+      fakeContent: {
+        size: {
+          width: self.$fakeContent.width(),
+          height: self.$fakeContent.height()
+        },
+        position: self.$fakeContent.position()
+      },
+      wrapper: {
+        size: {
+          width: self.$wrapper.width(),
+          height: self.$wrapper.height()
+        },
+        position: self.$wrapper.position()
+      },
+      scale: self.scale,
       scroll: {
         left: scrollLeft,
         top: scrollTop,
