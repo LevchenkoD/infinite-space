@@ -98,7 +98,10 @@ if (typeof module !== 'undefined' && module.exports != null) {
   }
 
   /**
-   * InfiniteSpace - expand parent size and scroll based on children position
+   * InfiniteSpace
+   * 
+   * @module src/infinite-space
+   * @desc expand parent size and scroll based on children position
    * @param {Object} Data - instance initial data object.
    * @param {string} Data.wrapper - wrapper selector.
    * @param {object} Data.fakeContentSize - fake content dimentions
@@ -186,6 +189,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
   /**
    * handleDrag - handle new element position
+   * @memberof module:src/infinite-space
    * @param {array} position - new position of dragged element
    * @param {object} element - dragged DOM element
   */
@@ -309,6 +313,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
   /**
    * update - update instance with new data
+   * @memberof module:src/infinite-space
    * @param {object} data - data object
    * @param {number} data.scale - canvas scale [0,1] float
   */
@@ -318,6 +323,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
   /**
    * handleDrop - handle element drag end event
+   * @memberof module:src/infinite-space
    * @param {object} element - dragged DOM element
   */
   InfiniteSpace.prototype.handleDrop = function (element) {
@@ -372,6 +378,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
   /**
    * init - initialize instance and calculate defaults
+   * @memberof module:src/infinite-space
    * @param {object} Data - data object
    * @see InfiniteSpace
   */
