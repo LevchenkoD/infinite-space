@@ -35,6 +35,13 @@ let defaultCalculateOptions = {
     
     elementMarginTop: 0,
     elementMarginLeft: 0,
+
+    padding: {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
 };
 
 
@@ -59,6 +66,26 @@ describe('InfiniteSpace', function () {
             };
             assert.equal(InfiniteSpace.calculateDrag(options).scrollToTop, true);
         });
+        it('should allow scroll top with padding', function () {
+
+            let options = {
+                ...defaultCalculateOptions,
+                lastPosition: [0,1],
+                elementPosition: {top: 100, left: 0},
+                padding: {top: 100, left: 0},
+            };
+            assert.equal(InfiniteSpace.calculateDrag(options).scrollToTop, true);
+        });
+        it('should NOT allow scroll top with padding', function () {
+
+            let options = {
+                ...defaultCalculateOptions,
+                lastPosition: [0,1],
+                elementPosition: {top: 300, left: 0},
+                padding: {top: 100, left: 0},
+            };
+            assert.equal(InfiniteSpace.calculateDrag(options).scrollToTop, false);
+        });
 
 
 
@@ -77,9 +104,29 @@ describe('InfiniteSpace', function () {
 
             let options = {
                 ...defaultCalculateOptions,
-                lastPosition: [1,0]
+                lastPosition: [1,0],
             };
             assert.equal(InfiniteSpace.calculateDrag(options).scrollToLeft, true);
+        });
+        it('should allow scroll left with padding', function () {
+
+            let options = {
+                ...defaultCalculateOptions,
+                lastPosition: [1,0],
+                elementPosition: {top: 0, left: 100},
+                padding: {top: 0, left: 100},
+            };
+            assert.equal(InfiniteSpace.calculateDrag(options).scrollToLeft, true);
+        });
+        it('should NOT allow scroll left with padding', function () {
+
+            let options = {
+                ...defaultCalculateOptions,
+                lastPosition: [1,0],
+                elementPosition: {top: 0, left: 300},
+                padding: {top: 0, left: 100},
+            };
+            assert.equal(InfiniteSpace.calculateDrag(options).scrollToLeft, false);
         });
 
 

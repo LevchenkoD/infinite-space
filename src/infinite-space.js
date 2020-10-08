@@ -49,7 +49,7 @@ function calculateDrag(options) {
     isMovingToTop = options.lastPosition[1] > options.position[1],
     topDistance = contentTop + top,
     adjustTop = isMovingToTop && options.fakeContentPosition.top + topDistance <= options.edgeDistance + options.padding.top,
-    scrollToTop = isMovingToTop && contentTop + top <= options.scrollTop / options.scale + options.edgeDistance,
+    scrollToTop = isMovingToTop && (contentTop - (options.scrollTop / options.scale) + elementTop <= options.edgeDistance + options.padding.top),
 
     isMovingToBottom = options.lastPosition[1] < options.position[1],
     bottomDistance = options.fakeContentPosition.top + options.fakeContentHeight - contentTop - elementBottomSide,
@@ -59,13 +59,13 @@ function calculateDrag(options) {
     isMovingToLeft = options.lastPosition[0] > options.position[0],
     leftDistance = contentLeft + left,
     adjustLeft = isMovingToLeft && options.fakeContentPosition.left + leftDistance <= options.edgeDistance + options.padding.left,
-    scrollToLeft = isMovingToLeft && contentLeft + left <= options.scrollLeft / options.scale + options.edgeDistance,
+    scrollToLeft  = isMovingToLeft && (contentLeft - (options.scrollLeft / options.scale) + elementLeft <= options.edgeDistance + options.padding.left),
 
     isMovingToRight = options.lastPosition[0] < options.position[0],
     rightDistance = options.fakeContentPosition.left + options.fakeContentWidth - contentLeft - elementRightSide,
     adjustRight = isMovingToRight && options.edgeDistance >= rightDistance,
     scrollToRight = isMovingToRight && options.scrollLeft / options.scale + (options.wrapperWidth / options.scale) - (options.position[0] + contentLeft + options.elementWidth) - options.elementMarginLeft < options.edgeDistance;
-   
+
   return {
     adjustTop: adjustTop,
     scrollToTop: scrollToTop,
