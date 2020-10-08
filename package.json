@@ -26,7 +26,8 @@
     "publish": "npm test && npm run build_prod && npm run build_docs",
     "build_prod": "gulp",
     "build_stage": "LOGS=true gulp",
-    "build_docs": "documentation build ./src/infinite-space.js -f md > ./docs/main.md"
+    "build_docs": "jsdoc -c jsdoc.conf.json",
+    "build_docs_md": "documentation build ./src/infinite-space.js -f md > ./docs/main.md"
   },
   "repository": {
     "type": "git",
