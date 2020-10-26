@@ -56,7 +56,7 @@ describe('InfiniteSpace', function () {
                 elementPosition: {left: -427, top: -186},
                 elementMarginTop: -400,
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).adjustTop, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).adjustTop, true);
         });        
         it('should allow scroll top', function () {
 
@@ -64,7 +64,7 @@ describe('InfiniteSpace', function () {
                 ...defaultCalculateOptions,
                 lastPosition: [0,1]
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToTop, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToTop, true);
         });
         it('should allow scroll top with padding', function () {
 
@@ -74,7 +74,7 @@ describe('InfiniteSpace', function () {
                 elementPosition: {top: 100, left: 0},
                 padding: {top: 100, left: 0},
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToTop, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToTop, true);
         });
         it('should NOT allow scroll top with padding', function () {
 
@@ -84,7 +84,7 @@ describe('InfiniteSpace', function () {
                 elementPosition: {top: 300, left: 0},
                 padding: {top: 100, left: 0},
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToTop, false);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToTop, false);
         });
 
 
@@ -98,7 +98,7 @@ describe('InfiniteSpace', function () {
                 position: [-650,0],
                 lastPosition: [-649,0]
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).adjustLeft, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).adjustLeft, true);
         });
         it('should allow scroll left', function () {
 
@@ -106,7 +106,7 @@ describe('InfiniteSpace', function () {
                 ...defaultCalculateOptions,
                 lastPosition: [1,0],
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToLeft, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToLeft, true);
         });
         it('should allow scroll left with padding', function () {
 
@@ -116,7 +116,7 @@ describe('InfiniteSpace', function () {
                 elementPosition: {top: 0, left: 100},
                 padding: {top: 0, left: 100},
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToLeft, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToLeft, true);
         });
         it('should NOT allow scroll left with padding', function () {
 
@@ -126,7 +126,7 @@ describe('InfiniteSpace', function () {
                 elementPosition: {top: 0, left: 300},
                 padding: {top: 0, left: 100},
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToLeft, false);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToLeft, false);
         });
 
 
@@ -141,7 +141,7 @@ describe('InfiniteSpace', function () {
                 lastPosition: [1948,0]
             };
             // console.log('result', InfiniteSpace.calculateDrag(options));
-            assert.equal(InfiniteSpace.calculateDrag(options).adjustRight, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).adjustRight, true);
         });
         it('should allow scroll right', function () {
 
@@ -151,7 +151,7 @@ describe('InfiniteSpace', function () {
                 position: [1218,0],
                 lastPosition: [1217,0],
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToRight, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToRight, true);
         });
 
 
@@ -163,7 +163,7 @@ describe('InfiniteSpace', function () {
                 position: [313,602],
                 lastPosition: [312,601]
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).adjustBottom, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).adjustBottom, true);
         });
         it('should allow scroll bottom', function () {
             let options = {
@@ -173,7 +173,7 @@ describe('InfiniteSpace', function () {
                 position: [313,294],
                 lastPosition: [312,293]
             };
-            assert.equal(InfiniteSpace.calculateDrag(options).scrollToBottom, true);
+            assert.strictEqual(InfiniteSpace.calculateDrag(options).scrollToBottom, true);
         });
 
     });
