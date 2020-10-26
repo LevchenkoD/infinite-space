@@ -23,6 +23,7 @@
   },
   "scripts": {
     "test": "mocha",
+    "start": "gulp && gulp watch",
     "publish": "npm test && npm run build_prod && npm run build_docs",
     "build_prod": "gulp",
     "build_stage": "LOGS=true gulp",

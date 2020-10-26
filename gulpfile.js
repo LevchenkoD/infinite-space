@@ -4,6 +4,8 @@ const gulp = require('gulp');
 const clean = require('gulp-clean');
 const gulp_remove_logging = require('gulp-remove-logging');
 const minify = require('gulp-minify');
+const livereload = require('gulp-livereload');
+
 
 const KEEP_LOGS = !!process.env.LOG;
 
@@ -52,3 +54,8 @@ gulp.task(
   )
 );
   
+
+gulp.task('watch', function() {
+  livereload.listen();
+  gulp.watch('src/**/*.js', gulp.parallel('default'));
+});
