@@ -316,9 +316,40 @@ if (typeof module !== 'undefined' && module.exports != null) {
    * @memberof module:src/infinite-space
    * @param {object} data - data object
    * @param {number} data.scale - canvas scale [0,1] float
+   * @param {object} data.fakeContentSize - fake content size object
+   * @param {number} data.fakeContentSize.width - width in px
+   * @param {number} data.fakeContentSize.height - height in px
+   * @param {object} data.fakeContentPosition - fake content position object
+   * @param {number} data.fakeContentPosition.top - top in px
+   * @param {number} data.fakeContentPosition.left - left in px
+   * @param {object} data.contentSize - content size object
+   * @param {number} data.contentSize.width - width in px
+   * @param {number} data.contentSize.height - height in px
+   * @param {object} data.contentPosition - content position object
+   * @param {number} data.contentPosition.top - top in px
+   * @param {number} data.contentPosition.left - left in px
   */
   InfiniteSpace.prototype.update = function (data) {
     this.scale = data.scale || this.scale;
+
+    this.fakeContentSize = data.fakeContentSize || this.$fakeContent.size();
+    this.fakeContentPosition = data.fakeContentPosition || this.$fakeContent.position();
+    this.contentSize = data.contentSize || this.$content.size();
+    this.contentPosition = data.contentPosition ||  this.$content.position();
+
+    this.$content.css({
+                  top: this.contentPosition.top,
+                  left: this.contentPosition.left,
+                  height: this.contentSize.height,
+                  width: this.contentSize.width,
+                });
+        
+    this.$fakeContent.css({
+                  top: this.fakeContentPosition.top,
+                  left: this.fakeContentPosition.left,
+                  height: this.fakeContentSize.height,
+                  width: this.fakeContentSize.width,
+                });    
   };
 
   /**
