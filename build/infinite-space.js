@@ -98,7 +98,10 @@ if (typeof module !== 'undefined' && module.exports != null) {
   }
 
   /**
-   * InfiniteSpace - expand parent size and scroll based on children position
+   * InfiniteSpace
+   * 
+   * @module src/infinite-space
+   * @desc expand parent size and scroll based on children position
    * @param {Object} Data - instance initial data object.
    * @param {string} Data.wrapper - wrapper selector.
    * @param {object} Data.fakeContentSize - fake content dimentions
@@ -186,6 +189,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
   /**
    * handleDrag - handle new element position
+   * @memberof module:src/infinite-space
    * @param {array} position - new position of dragged element
    * @param {object} element - dragged DOM element
   */
@@ -309,15 +313,48 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
   /**
    * update - update instance with new data
+   * @memberof module:src/infinite-space
    * @param {object} data - data object
    * @param {number} data.scale - canvas scale [0,1] float
+   * @param {object} data.fakeContentSize - fake content size object
+   * @param {number} data.fakeContentSize.width - width in px
+   * @param {number} data.fakeContentSize.height - height in px
+   * @param {object} data.fakeContentPosition - fake content position object
+   * @param {number} data.fakeContentPosition.top - top in px
+   * @param {number} data.fakeContentPosition.left - left in px
+   * @param {object} data.contentSize - content size object
+   * @param {number} data.contentSize.width - width in px
+   * @param {number} data.contentSize.height - height in px
+   * @param {object} data.contentPosition - content position object
+   * @param {number} data.contentPosition.top - top in px
+   * @param {number} data.contentPosition.left - left in px
   */
   InfiniteSpace.prototype.update = function (data) {
     this.scale = data.scale || this.scale;
+
+    this.fakeContentSize = data.fakeContentSize || this.$fakeContent.size();
+    this.fakeContentPosition = data.fakeContentPosition || this.$fakeContent.position();
+    this.contentSize = data.contentSize || this.$content.size();
+    this.contentPosition = data.contentPosition ||  this.$content.position();
+
+    this.$content.css({
+                  top: this.contentPosition.top,
+                  left: this.contentPosition.left,
+                  height: this.contentSize.height,
+                  width: this.contentSize.width,
+                });
+        
+    this.$fakeContent.css({
+                  top: this.fakeContentPosition.top,
+                  left: this.fakeContentPosition.left,
+                  height: this.fakeContentSize.height,
+                  width: this.fakeContentSize.width,
+                });    
   };
 
   /**
    * handleDrop - handle element drag end event
+   * @memberof module:src/infinite-space
    * @param {object} element - dragged DOM element
   */
   InfiniteSpace.prototype.handleDrop = function (element) {
@@ -372,6 +409,7 @@ if (typeof module !== 'undefined' && module.exports != null) {
 
   /**
    * init - initialize instance and calculate defaults
+   * @memberof module:src/infinite-space
    * @param {object} Data - data object
    * @see InfiniteSpace
   */
